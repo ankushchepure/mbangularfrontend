@@ -5,5 +5,5 @@ export class Employee {
     address: string;
     dob: string;
     mobile: string;
-    managerId:number
+    managerid:number
 }

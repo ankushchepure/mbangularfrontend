@@ -36,8 +36,13 @@ export class HomeComponent implements OnInit {
         // private modalService: ModalService
     ) {
       this.currentUserSubject = JSON.parse(localStorage.getItem('currentUser'));
+      
       this.managerid=this.currentUserSubject.data.data.id;
         this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    }
+    createAuthorizationHeader(headers: Headers) {
+      headers.append('Authorization', 'Token ' +
+      this.currentUserSubject.data.data.token); 
     }
     ngOnInit() {
      this.getAllEmployeeList();
@@ -63,9 +68,7 @@ export class HomeComponent implements OnInit {
       if (this.registerForm.invalid) {
           return;
       }
-
       this.loading = true;
-      console.log(this.registerForm.value);
       this.employeeService.register(this.registerForm.value,this.managerid)
           .pipe(first())
           .subscribe(
@@ -74,17 +77,24 @@ export class HomeComponent implements OnInit {
                       this.toastr.success(data.errorMessage);
                       this.getAllEmployeeList();
                       this.loading = false;
-                      let el: HTMLElement = this.myDiv.nativeElement;
+                      this.modalService.dismissAll();
+                      this.registerForm.reset();
+                      Object.keys(this.registerForm.controls).forEach(key => {
+                        this.registerForm.get(key).setErrors(null) ;
+                      });
+                      // let el: HTMLElement = this.myDiv.nativeElement;
                       
-                      el.click();
-                    
+                      // el.click();
+                      
                       this.loading = false;
                   } else {
+                    console.log(data.message);
                       this.toastr.error(data.errorMessage);
                       this.loading = false;
                   }                    
               },
               error => {
+                  console.log(error);
                   this.toastr.error(error.message);
                   this.loading = false;
               });
@@ -107,12 +117,14 @@ export class HomeComponent implements OnInit {
               if(data.status==true){
                 this.EmployeeData=data.data.data;
               } else {
+                console.log(data.message);
                   this.toastr.error(data.errorMessage);
                   
               } 
           },
           error => {
-              this.toastr.error(error);
+            console.log(error.message);
+              this.toastr.error(error.message);
              
           });
     }
@@ -129,7 +141,6 @@ export class HomeComponent implements OnInit {
           data => {
               if(data.status==true){
                 this.toastr.success(data.errorMessage);
-                
                 this.getAllEmployeeList();
               } else {
                   this.toastr.error(data.errorMessage);
