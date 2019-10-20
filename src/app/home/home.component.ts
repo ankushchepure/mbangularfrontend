@@ -72,11 +72,12 @@ export class HomeComponent implements OnInit {
               data => {
                   if(data.status==true){
                       this.toastr.success(data.errorMessage);
+                      this.getAllEmployeeList();
                       this.loading = false;
                       let el: HTMLElement = this.myDiv.nativeElement;
                       
                       el.click();
-                      this.getAllEmployeeList();
+                    
                       this.loading = false;
                   } else {
                       this.toastr.error(data.errorMessage);
